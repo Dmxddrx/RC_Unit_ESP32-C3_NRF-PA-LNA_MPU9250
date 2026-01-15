@@ -1,7 +1,12 @@
 #include "mpu6500.h"
+#include "nrf24l01.h"
 
 #define SDA_PIN 6
 #define SCL_PIN 7
+
+// ---------- NRF24 PINS (ESP32-C3) ----------
+#define NRF_CE  3
+#define NRF_CSN 10
 
 MPU6500 imu;
 
