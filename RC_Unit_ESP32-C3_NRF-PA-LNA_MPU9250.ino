@@ -9,6 +9,7 @@
 #define NRF_CSN 10
 
 MPU6500 imu;
+NRF24_TX radioTX;
 
 // ---------------- CONFIG ----------------
 const float DEAD_ZONE = 0.16;
@@ -65,8 +66,16 @@ Direction getCrossDirection(float x, float y) {
 // ----------------------------------------
 void setup() {
   Serial.begin(115200);
+  
   imu.begin(&Wire, SDA_PIN, SCL_PIN);
-  Serial.println("MPU6500 Ready");
+
+    // ✅ NRF24 INIT
+  if (!radioTX.begin(NRF_CE, NRF_CSN)) {
+    Serial.println("❌ NRF24 INIT FAILED");
+    while (1);
+  }
+  
+  Serial.println("MPU6500 + NRF24 Ready");
 }
 
 // ----------------------------------------
@@ -76,21 +85,27 @@ void loop() {
   float x = imu.x();
   float y = imu.y();
 
+  Direction dir = STOP;
+  int speed = 0;
+
   Serial.print("X: "); Serial.print(x, 2);
   Serial.print(" Y: "); Serial.print(y, 2);
 
   // -------- STOP CONDITION --------
   if (fabs(x) < DEAD_ZONE && fabs(y) < DEAD_ZONE) {
+
+    dir = STOP;
+    speed = 0;
+
+    radioTX.send(dir, speed);   // ✅ SEND STOP
     Serial.println(" | STOP | Speed: 0%");
-    delay(100);
+    delay(30);
     return;
   }
 
   bool xActive = fabs(x) >= DEAD_ZONE;
   bool yActive = fabs(y) >= DEAD_ZONE;
 
-  Direction dir = STOP;
-  int speed = 0;
 
   // -------- SINGLE AXIS --------
   if (xActive ^ yActive) {
@@ -115,12 +130,15 @@ void loop() {
     }
   }
 
+  // -------- SEND DATA --------
+  radioTX.send(dir, speed);   // ✅ SEND VIA NRF24
+  
   // -------- OUTPUT --------
-  Serial.print(" | DIR: ");
-  Serial.print(dir);
-  Serial.print(" | Speed: ");
-  Serial.print(speed);
+  Serial.print("X: "); Serial.print(x, 2);
+  Serial.print(" Y: "); Serial.print(y, 2);
+  Serial.print(" | DIR: "); Serial.print(dir);
+  Serial.print(" | Speed: "); Serial.print(speed);
   Serial.println("%");
 
-  delay(100);
+  delay(30);
 }
