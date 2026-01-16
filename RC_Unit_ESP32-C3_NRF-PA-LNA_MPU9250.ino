@@ -1,3 +1,4 @@
+#include <SPI.h>
 #include "mpu6500.h"
 #include "nrf24l01.h"
 
@@ -66,6 +67,8 @@ Direction getCrossDirection(float x, float y) {
 // ----------------------------------------
 void setup() {
   Serial.begin(115200);
+  SPI.begin(4, 2, 5, 10);  
+// SCK, MISO, MOSI, SS(CSN)
   
   imu.begin(&Wire, SDA_PIN, SCL_PIN);
 
@@ -88,8 +91,8 @@ void loop() {
   Direction dir = STOP;
   int speed = 0;
 
-  Serial.print("X: "); Serial.print(x, 2);
-  Serial.print(" Y: "); Serial.print(y, 2);
+  //Serial.print("X: "); Serial.print(x, 2);
+  //Serial.print(" Y: "); Serial.print(y, 2);
 
   // -------- STOP CONDITION --------
   if (fabs(x) < DEAD_ZONE && fabs(y) < DEAD_ZONE) {
