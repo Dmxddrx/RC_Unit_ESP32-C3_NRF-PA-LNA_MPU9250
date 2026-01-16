@@ -1,6 +1,6 @@
-#include <SPI.h>
 #include "mpu6500.h"
 #include "nrf24l01.h"
+#include "led.h"
 
 #define SDA_PIN 6
 #define SCL_PIN 7
@@ -15,6 +15,11 @@ NRF24_TX radioTX;
 // ---------------- CONFIG ----------------
 const float DEAD_ZONE = 0.16;
 
+// -------- NRF STATUS --------
+bool nrfOk = false;
+unsigned long lastNrfPrint = 0;
+
+// -------- DIRECTION ENUM --------
 enum Direction {
   STOP,
   FWD, FWD_RIGHT, RIGHT, BACK_RIGHT,
@@ -67,18 +72,20 @@ Direction getCrossDirection(float x, float y) {
 // ----------------------------------------
 void setup() {
   Serial.begin(115200);
-  SPI.begin(4, 2, 5, 10);  
-// SCK, MISO, MOSI, SS(CSN)
-  
+
+  // SPI: SCK, MISO, MOSI, CSN
+  SPI.begin(4, 2, 5, NRF_CSN);
+
   imu.begin(&Wire, SDA_PIN, SCL_PIN);
 
-    // ✅ NRF24 INIT
+  // -------- NRF INIT --------
   if (!radioTX.begin(NRF_CE, NRF_CSN)) {
     Serial.println("❌ NRF24 INIT FAILED");
-    while (1);
+    nrfOk = false;
+  } else {
+    Serial.println("✅ NRF24 INIT OK");
+    nrfOk = true;
   }
-  
-  Serial.println("MPU6500 + NRF24 Ready");
 }
 
 // ----------------------------------------
@@ -91,8 +98,18 @@ void loop() {
   Direction dir = STOP;
   int speed = 0;
 
-  //Serial.print("X: "); Serial.print(x, 2);
-  //Serial.print(" Y: "); Serial.print(y, 2);
+  // -------- NRF STATUS MONITOR --------
+  if (millis() - lastNrfPrint > 1000) {
+    lastNrfPrint = millis();
+
+    if (radioTX.isOk()) {
+      Serial.println("📡 NRF24 STATUS: OK");
+      nrfOk = true;
+    } else {
+      Serial.println("❌ NRF24 STATUS: NOT RESPONDING");
+      nrfOk = false;
+    }
+  }
 
   // -------- STOP CONDITION --------
   if (fabs(x) < DEAD_ZONE && fabs(y) < DEAD_ZONE) {

@@ -12,10 +12,12 @@ typedef struct {
 class NRF24_TX {
 public:
     bool begin(uint8_t cePin, uint8_t csnPin);
-    void send(uint8_t direction, uint8_t speed);
+    bool send(uint8_t direction, uint8_t speed);
+    bool isOk();
 
 private:
     RF24 radio = RF24(0, 0);
+    bool initialized = false;
     const byte address[6] = "CAR01";
 };
 

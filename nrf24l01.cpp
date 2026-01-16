@@ -3,7 +3,10 @@
 bool NRF24_TX::begin(uint8_t cePin, uint8_t csnPin) {
     radio = RF24(cePin, csnPin);
 
-    if (!radio.begin()) return false;
+    if (!radio.begin()) {
+        initialized = false;
+        return false;
+    }
 
     radio.setPALevel(RF24_PA_MAX);
     radio.setDataRate(RF24_1MBPS);
@@ -12,13 +15,20 @@ bool NRF24_TX::begin(uint8_t cePin, uint8_t csnPin) {
     radio.openWritingPipe(address);
     radio.stopListening();
 
-    return true;
+    initialized = radio.isChipConnected();
+    return initialized;
 }
 
-void NRF24_TX::send(uint8_t direction, uint8_t speed) {
+bool NRF24_TX::send(uint8_t direction, uint8_t speed) {
+    if (!initialized) return false;
+
     ControlPacket pkt;
     pkt.direction = direction;
     pkt.speed = speed;
 
-    radio.write(&pkt, sizeof(pkt));
+    return radio.write(&pkt, sizeof(pkt));
+}
+
+bool NRF24_TX::isOk() {
+    return initialized && radio.isChipConnected();
 }
