@@ -1,6 +1,6 @@
 #include "wireless.h"
 
-// WiFi setup
+// ---------------------- WiFi ----------------------
 void Wireless::initWiFi(const char* ssid, const char* password) {
     Serial.print("Connecting to WiFi: ");
     Serial.println(ssid);
@@ -37,22 +37,31 @@ void Wireless::printWiFiStatus() {
     }
 }
 
-// BLE setup
+// ---------------------- BLE ----------------------
 void Wireless::initBLE(const char* deviceName, const char* serviceUUID, const char* charUUID) {
+    // Initialize BLE
     BLEDevice::init(deviceName);
 
+    // Create BLE server
     pServer = BLEDevice::createServer();
-    pServer->setCallbacks(new MyServerCallbacks());
 
+    // ✅ Set callbacks for connect/disconnect
+    pServer->setCallbacks(new MyServerCallbacks(this));
+
+    // Create service and characteristic
     BLEService* pService = pServer->createService(serviceUUID);
     pCharacteristic = pService->createCharacteristic(
         charUUID,
         BLECharacteristic::PROPERTY_NOTIFY
     );
 
+    // Add descriptor for notifications
     pCharacteristic->addDescriptor(new BLE2902());
+
+    // Start the service
     pService->start();
 
+    // Start advertising
     BLEAdvertising* pAdvertising = BLEDevice::getAdvertising();
     pAdvertising->addServiceUUID(serviceUUID);
     pAdvertising->setScanResponse(true);
