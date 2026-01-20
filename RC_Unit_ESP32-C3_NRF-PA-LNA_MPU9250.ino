@@ -9,8 +9,11 @@
 #define NRF_CE  3
 #define NRF_CSN 10
 
+#define LED_PIN 0
+
 MPU6500 imu;
 NRF24_TX radioTX;
+LEDController statusLED(LED_PIN);
 
 // ---------------- CONFIG ----------------
 const float DEAD_ZONE = 0.16;
@@ -86,6 +89,7 @@ void setup() {
     Serial.println("✅ NRF24 INIT OK");
     nrfOk = true;
   }
+  statusLED.begin();
 }
 
 // ----------------------------------------
@@ -110,6 +114,7 @@ void loop() {
       nrfOk = false;
     }
   }
+  statusLED.update(nrfOk);
 
   // -------- STOP CONDITION --------
   if (fabs(x) < DEAD_ZONE && fabs(y) < DEAD_ZONE) {

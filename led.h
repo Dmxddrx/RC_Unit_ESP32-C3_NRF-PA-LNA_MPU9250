@@ -9,15 +9,15 @@ public:
 
     void begin();
     void update(bool nrfOk); // call every loop, true = steady, false = blink
+    
 private:
     uint8_t _pin;
-    uint8_t _channel;
     uint32_t _freq;
     uint8_t _res;
 
     unsigned long _lastToggle = 0;
     bool _ledState = false;
-    const uint8_t _brightness = 128;
+    const uint8_t _brightness = 40;
     const unsigned long _blinkInterval = 500; // ms
 };
 

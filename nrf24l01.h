@@ -16,9 +16,10 @@ public:
     bool isOk();
 
 private:
-    RF24 radio = RF24(0, 0);
+    RF24 radio ;
     bool initialized = false;
-    const byte address[6] = "CAR01";
+    const byte address[5] = {'C','A','R','0','1'};
+
 };
 
 #endif
