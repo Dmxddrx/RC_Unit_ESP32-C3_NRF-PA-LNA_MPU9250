@@ -94,8 +94,6 @@ void setup() {
 
 // ----------------------------------------
 void loop() {
-  ArduinoOTA.handle();
-
   imu.update();
 
   float x = imu.x();

@@ -11,7 +11,8 @@ bool NRF24_TX::begin(uint8_t cePin, uint8_t csnPin) {
     radio.setPALevel(RF24_PA_MAX);
     radio.setDataRate(RF24_1MBPS);
     radio.setChannel(108);
-    radio.setRetries(3, 5);
+    radio.setAutoAck(false);
+    radio.setRetries(0,0);
     radio.openWritingPipe(address);
     radio.stopListening();
 
