@@ -95,14 +95,14 @@ void setup() {
   }
   statusLED.begin();
   
- // -------- WIFI INIT --------
+ // Inside setup()
 wireless.initWiFi("Dialog 4G 079", "BA7b01b7");  // <-- connect first
 
 if (wireless.isWiFiConnected()) {
     Serial.println("WiFi connected successfully! IP:");
     Serial.println(WiFi.localIP());
 
-    // Then setup OTA
+    // OTA setup
     ArduinoOTA.onStart([]() { Serial.println("OTA Start"); });
     ArduinoOTA.onEnd([]() { Serial.println("\nOTA End"); });
     ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
@@ -117,10 +117,11 @@ if (wireless.isWiFiConnected()) {
         else if (error == OTA_END_ERROR) Serial.println("End Failed");
     });
 
-    ArduinoOTA.begin(); // <-- after WiFi
+    ArduinoOTA.begin();
 } else {
     Serial.println("WiFi connection failed!");
 }
+
 
 }
 
