@@ -40,18 +40,18 @@ int speedSingleAxis(float v) {
   v = fabs(v);
 
   if (v <= 0.16) return 0;
-  if (v >= 0.85) return 70;
-  if (v >= 0.6)  return mapLinear(v, 0.6, 0.85, 60, 70);
-  return mapLinear(v, 0.16, 0.6, 30, 60);
+  if (v >= 0.85) return 100;
+  if (v >= 0.6)  return mapLinear(v, 0.6, 0.85, 60, 100);
+  return mapLinear(v, 0.16, 0.6, 0, 60);
 }
 
 // ----------------------------------------
 int speedDualAxis(float v) {
   v = constrain(v, 0.1, 0.7);
 
-  if (v >= 0.6) return 70;
-  if (v >= 0.5) return mapLinear(v, 0.5, 0.6, 60, 70);
-  return mapLinear(v, 0.1, 0.5, 30, 60);
+  if (v >= 0.6) return 100;
+  if (v >= 0.5) return mapLinear(v, 0.5, 0.6, 60, 100);
+  return mapLinear(v, 0.1, 0.5, 0, 60);
 }
 
 // ----------------------------------------
@@ -94,6 +94,12 @@ void setup() {
 
 // ----------------------------------------
 void loop() {
+
+  // ----- HARD TEST: constant packet -----
+  /*radioTX.send(5, 40);   // DIR=5, SPEED=40
+  Serial.println("TX: DIR=5 SPD=40");
+  delay(50);*/
+  
   imu.update();
 
   float x = imu.x();
@@ -107,10 +113,10 @@ void loop() {
     lastNrfPrint = millis();
 
     if (radioTX.isOk()) {
-      Serial.println("📡 NRF24 STATUS: OK");
+      //Serial.println("📡 NRF24 STATUS: OK");
       nrfOk = true;
     } else {
-      Serial.println("❌ NRF24 STATUS: NOT RESPONDING");
+      //Serial.println("❌ NRF24 STATUS: NOT RESPONDING");
       nrfOk = false;
     }
   }
@@ -122,9 +128,9 @@ void loop() {
     dir = STOP;
     speed = 0;
 
-    radioTX.send(dir, speed);   // ✅ SEND STOP
-    Serial.println(" | STOP | Speed: 0%");
-    delay(30);
+    radioTX.send(0, speed);   // ✅ SEND STOP
+    //Serial.println(" | STOP | Speed: 0%");
+    //delay(30);
     return;
   }
 
@@ -159,11 +165,14 @@ void loop() {
   radioTX.send(dir, speed);   // ✅ SEND VIA NRF24
   
   // -------- OUTPUT --------
-  Serial.print("X: "); Serial.print(x, 2);
+  /*Serial.print("X: "); Serial.print(x, 2);
   Serial.print(" Y: "); Serial.print(y, 2);
   Serial.print(" | DIR: "); Serial.print(dir);
   Serial.print(" | Speed: "); Serial.print(speed);
-  Serial.println("%");
+  Serial.println("%");*/
 
-  delay(30);
+Serial.println(dir);
+Serial.print(speed);
+
+  delay(10);
 }

@@ -8,8 +8,11 @@ bool NRF24_TX::begin(uint8_t cePin, uint8_t csnPin) {
         return false;
     }
 
-    radio.setPALevel(RF24_PA_MAX);
+    radio.setPALevel(RF24_PA_LOW);
     radio.setDataRate(RF24_1MBPS);
+    radio.setCRCLength(RF24_CRC_16);
+    radio.disableDynamicPayloads();
+    radio.setPayloadSize(sizeof(ControlPacket));
     radio.setChannel(108);
     radio.setAutoAck(false);
     radio.setRetries(0,0);
