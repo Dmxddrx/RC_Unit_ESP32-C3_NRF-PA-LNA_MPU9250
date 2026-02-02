@@ -42,7 +42,7 @@ int speedSingleAxis(float v) {
   if (v <= 0.16) return 0;
   if (v >= 0.85) return 100;
   if (v >= 0.6)  return mapLinear(v, 0.6, 0.85, 60, 100);
-  return mapLinear(v, 0.16, 0.6, 0, 60);
+  return mapLinear(v, 0.16, 0.6, 30, 60);
 }
 
 // ----------------------------------------
@@ -51,7 +51,7 @@ int speedDualAxis(float v) {
 
   if (v >= 0.6) return 100;
   if (v >= 0.5) return mapLinear(v, 0.5, 0.6, 60, 100);
-  return mapLinear(v, 0.1, 0.5, 0, 60);
+  return mapLinear(v, 0.1, 0.5, 30, 60);
 }
 
 // ----------------------------------------
